@@ -1,4 +1,6 @@
-number num();
-num() -> {
-
-}
+number num, num2;
+ptr numPtr, num2Ptr;
+num = 12;
+num2 = num*2;
+numPtr = &num;
+num2Ptr = numPtr + 1;

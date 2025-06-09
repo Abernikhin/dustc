@@ -9,7 +9,7 @@ class node():
         self.child = list(child)
 
     def info(self, size: int = 0) -> None:
-        print(' '*size+"|~ "+self.lit)
+        print('  '*size+"|~ "+self.lit)
         for i in self.child:
             i.info(size+1)
 
