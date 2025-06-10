@@ -20,6 +20,8 @@ class lexer():
             "operator*": r"(\*)",
             "operator/": r"(\/)",
             "operator&": r"(\&)",
+            "open": r"(\()",
+            "close": r"(\))",
             "skip": r"(\s+)",
         }
 

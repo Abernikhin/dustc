@@ -33,12 +33,50 @@ class parser():
         if self.char.get_type(self.tokens[0].lit):
             self.reslut.append(node("var type", self.tokens[0]))
             if self.tokens[1].type == "name":
-                if self.char.get_name(self.tokens[1].lit):
-                    raise parser_double_init()
-                else:
-                    self.char.add_name(self.tokens[1].lit)
-                    self.reslut[-1].append(node("var name", self.tokens[1]))
+                if self.tokens[2].lit == '(':
+                    funcl = [self.tokens[1].lit]
                     self.tokens.pop(1)
+                    self.tokens.pop(1)
+                    index = 1
+                    while True:
+                        if self.tokens[index].lit == ')':
+                            break
+                        if self.tokens != ',' and self.char.get_type(
+                            self.tokens[index].lit
+                                                                     ):
+                            funcl.append(self.tokens[index].lit)
+                        index += 1
+                    for i in range(0, index):
+                        self.tokens.pop(1)
+                    self.char.add_func(tuple(funcl))
+                    self.reslut.append(
+                        node("type", self.tokens[0], node(
+                            "func name",
+                            token(
+                                "name",
+                                self.char.func[-1][0]
+                                )
+                            )
+                        ))
+                    for i in range(1, len(self.char.func[-1])):
+                        self.reslut[-1].child[-1].append(node("op", token(
+                                            "",
+                                            self.char.func[-1][i])
+                                                    )
+                                               )
+                else:
+                    if self.char.get_name(self.tokens[1].lit):
+                        raise parser_double_init()
+                    else:
+                        self.char.add_name(self.tokens[1].lit,
+                                           self.tokens[0].lit
+                                           )
+                        self.reslut[-1].append(
+                            node(
+                                "var name", self.tokens[1]
+                                 )
+                                               )
+                        self.tokens.pop(1)
             else:
                 raise parser_wrong_syntax()
             if self.tokens[1].lit == ',':
@@ -66,6 +104,22 @@ class parser():
             self.tokens.pop(0)
             self.tokens.pop(0)
             self.reslut[-1].append(self.math())
+            self.semi()
+        else:
+            self.call()
+
+    def call(self) -> None:
+        if self.tokens[1].lit == "(":
+            self.reslut.append(node("call", self.tokens[0]))
+            index = 2
+            while True:
+                if self.tokens[index].lit == ')':
+                    break
+                if self.tokens[index].lit != ',':
+                    self.reslut[-1].append(node("op", self.tokens[index]))
+                index += 1
+            for i in range(0, index+1):
+                self.tokens.pop(0)
             self.semi()
 
     def semi(self) -> None:

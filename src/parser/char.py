@@ -12,10 +12,27 @@ class char():
             return True
         return False
 
-    def add_name(self, name: str) -> None:
-        self.name.append(name)
+    def add_name(self, name: str, _type: str) -> None:
+        self.name.append({"name": name, "type": _type})
+
+    def add_func(self, type: tuple) -> None:
+        self.func.append(type)
+
+    def get_func(self, func_name: str) -> bool:
+        for i in self.name:
+            if i[0] == func_name:
+                return True
+        return False
+
+    def get_args_func(self, *args) -> bool:
+        for i in self.func:
+            for a in range(1, len(i)):
+                if a == args:
+                    return True
+        return False
 
     def get_name(self, name) -> bool:
-        if name in self.name:
-            return True
+        for i in self.name:
+            if i["name"] == name:
+                return True
         return False

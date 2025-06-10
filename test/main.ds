@@ -1,6 +1,2 @@
-number num, num2;
-ptr numPtr, num2Ptr;
-num = 12;
-num2 = num*2;
-numPtr = &num;
-num2Ptr = numPtr + 1;
+number pow(number op1, number op0);
+pow(2, 3);
