@@ -11,3 +11,15 @@ number num, num2, num3;
 ```
 
 you cant init variable on the same line where variable created
+
+if write '()' after variable name you create function
+```cpp
+number sum();
+```
+
+in '()' you can via comma arguments for function
+```cpp
+number sum(arg_type arg_name, second_arg_type second_arg_name);
+```
+
+you can also just prototype the function
