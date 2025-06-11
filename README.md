@@ -23,3 +23,9 @@ number sum(arg_type arg_name, second_arg_type second_arg_name);
 ```
 
 you can also just prototype the function
+
+if you want to init variable you must write the next line
+```cpp
+var_name = value;
+```
+as value you can give functions, value or mathematical expression
