@@ -1,3 +1,11 @@
+class symantic_not_find_name_error(Exception):
+    pass
+
+
+class symantic_type_error(Exception):
+    pass
+
+
 class char():
     def __init__(self) -> None:
         self.type = ["number", "ptr"]
@@ -30,6 +38,12 @@ class char():
                 if a == args:
                     return True
         return False
+
+    def gname(self, name) -> dict:
+        for i in self.name:
+            if i["name"] == name:
+                return i
+        raise symantic_not_find_name()
 
     def get_name(self, name) -> bool:
         for i in self.name:

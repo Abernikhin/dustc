@@ -6,7 +6,7 @@ class node():
         self.type: str = type
         self.ltype = lit.type
         self.lit = lit.lit
-        self.child = list(child)
+        self.child = child
 
     def info(self, size: int = 0) -> None:
         print('  '*size+"|~ "+self.lit)
@@ -14,4 +14,6 @@ class node():
             i.info(size+1)
 
     def append(self, obj) -> None:
+        self.child = list(self.child)
         self.child.append(obj)
+        self.child = tuple(self.child)

@@ -24,10 +24,10 @@ class parser():
         self.char = char()
         self.reslut: list[node] = []
 
-    def parsing(self) -> list[node]:
+    def parsing(self):
         while self.tokens.__len__() > 0:
             self.let()
-        return self.reslut
+        return [self.reslut, self.char]
 
     def let(self) -> None:
         if self.tokens[0].lit == ';':
@@ -37,6 +37,7 @@ class parser():
             if self.tokens[1].type == "name":
                 if self.tokens[2].lit == '(':
                     funcl = [self.tokens[1].lit]
+                    func = []
                     self.tokens.pop(1)
                     self.tokens.pop(1)
                     index = 1
@@ -48,11 +49,25 @@ class parser():
                                                                      ):
                             funcl.append(self.tokens[index].lit)
                         index += 1
+                    index = 1
+                    while True:
+                        if self.tokens[index].lit == ')':
+                            break
+                        if self.tokens != ',' and self.char.get_type(
+                            self.tokens[index].lit
+                                                                     ):
+                            func.append(
+                                node("op",
+                                     self.tokens[index+1],
+                                     node("op", self.tokens[index])
+                                     )
+                                )
+                        index += 1
                     for i in range(0, index):
                         self.tokens.pop(1)
                     self.char.add_func(tuple(funcl))
                     self.reslut.append(
-                        node("type", self.tokens[0], node(
+                        node("var type", self.tokens[0], node(
                             "func name",
                             token(
                                 "name",
@@ -60,12 +75,8 @@ class parser():
                                 )
                             )
                         ))
-                    for i in range(1, len(self.char.func[-1])):
-                        self.reslut[-1].child[-1].append(node("op", token(
-                                            "",
-                                            self.char.func[-1][i])
-                                                    )
-                                               )
+                    for i in func:
+                        self.reslut[-1].child[-1].append(i)
                 else:
                     if self.char.get_name(self.tokens[1].lit):
                         raise parser_double_init()
@@ -82,6 +93,7 @@ class parser():
             else:
                 raise parser_wrong_syntax()
             if self.tokens[1].lit == ',':
+                self.reslut.append(node("new", self.tokens[1]))
                 self.tokens.pop(1)
             elif self.tokens[1].lit == ';':
                 self.tokens.pop(0)
@@ -155,7 +167,7 @@ class parser():
                          node(
                              "op", s, node(
                                   "ptr",
-                                  self.tokens[0],
+                                  self.tokens[0]
                                   )
                               )
                          )
@@ -186,7 +198,7 @@ class parser():
             self.tokens.pop(0)
             return n
         if self.tokens[1].lit == '(':
-            n = node("func", self.tokens[0])
+            n = node("call", self.tokens[0])
             self.tokens.pop(0)
             self.tokens.pop(0)
             while self.tokens[0].lit != ')':
