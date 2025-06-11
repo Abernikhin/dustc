@@ -30,7 +30,9 @@ class parser():
         return self.reslut
 
     def let(self) -> None:
-        if self.char.get_type(self.tokens[0].lit):
+        if self.tokens[0].lit == ';':
+            self.semi()
+        elif self.char.get_type(self.tokens[0].lit):
             self.reslut.append(node("var type", self.tokens[0]))
             if self.tokens[1].type == "name":
                 if self.tokens[2].lit == '(':
@@ -88,7 +90,9 @@ class parser():
             self.eq()
 
     def eq(self) -> None:
-        if self.tokens[1].lit == '=':
+        if self.tokens[0].lit == ';':
+            self.semi()
+        elif self.tokens[1].lit == '=':
             if self.tokens[0].type != "name":
                 raise parser_eq()
             self.reslut.append(
@@ -108,28 +112,28 @@ class parser():
         else:
             self.call()
 
-    def call(self) -> None:
-        if self.tokens[1].lit == "(":
-            self.reslut.append(node("call", self.tokens[0]))
-            index = 2
-            while True:
-                if self.tokens[index].lit == ')':
-                    break
-                if self.tokens[index].lit != ',':
-                    self.reslut[-1].append(node("op", self.tokens[index]))
-                index += 1
-            for i in range(0, index+1):
+    def semi(self) -> None:
+        try:
+            if self.tokens[0].lit == ';':
+                self.reslut.append(node("new", self.tokens[0]))
                 self.tokens.pop(0)
+            else:
+                raise parser_havent_semicolon()
+        except IndexError:
+            self.reslut.append(node("new", token("semicolon", ';')))
+
+    def call(self) -> None:
+        if self.tokens[0].lit == ';':
+            self.semi()
+        elif self.tokens[1].lit == '(':
+            self.reslut.append(self.math())
+            self.semi()
+        else:
             self.semi()
 
-    def semi(self) -> None:
-        if self.tokens[0].lit == ';':
-            self.reslut.append(node("new", self.tokens[0]))
-            self.tokens.pop(0)
-        else:
-            raise parser_havent_semicolon()
-
     def math(self) -> node:
+        if self.tokens[0].lit == ',':
+            self.tokens.pop(0)
         if self.tokens[1].lit == "+" or self.tokens[1].lit == "-":
             n = node("func", self.tokens[1], node("op", self.tokens[0]))
             self.tokens.pop(0)
@@ -144,7 +148,6 @@ class parser():
             return n
         elif self.tokens[0].lit == "&":
             s = self.tokens[0]
-            s.info()
             self.tokens.pop(0)
             if self.tokens[1].lit == "+" or self.tokens[1].lit == "-":
                 n = node("func",
@@ -180,6 +183,14 @@ class parser():
                                   self.tokens[0],
                                   )
                               )
+            self.tokens.pop(0)
+            return n
+        if self.tokens[1].lit == '(':
+            n = node("func", self.tokens[0])
+            self.tokens.pop(0)
+            self.tokens.pop(0)
+            while self.tokens[0].lit != ')':
+                n.append(self.math())
             self.tokens.pop(0)
             return n
         n = node("op", self.tokens[0])
