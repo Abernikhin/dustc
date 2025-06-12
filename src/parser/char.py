@@ -8,7 +8,7 @@ class symantic_type_error(Exception):
 
 class char():
     def __init__(self) -> None:
-        self.type = ["number", "ptr"]
+        self.type = ["number"]
         self.name = []
         self.func = []
 

@@ -10,11 +10,14 @@ class lexer():
     def __init__(self, code: str) -> None:
         self.code: str = code
         self.rules: dict = {
-            "num": r"(\d+)",
+            "index": r"\[(\d+)\]",
+            "num": r"(0x\d+|\d+)",
             "name": r"([\w\d\_]+)",
             "comma": r"(\,)",
             "semicolon": r"(\;)",
             "eq": r"(\=)",
+            "operator++": r"(\+\+)",
+            "operator--": r"(\-\-)",
             "operator+": r"(\+)",
             "operator-": r"(\-)",
             "operator*": r"(\*)",
@@ -46,6 +49,6 @@ class lexer():
                         self.reline(mo.group(0))
                         break
             else:
-                raise wrong_token_error()
+                raise wrong_token_error(self.code)
 
         return result

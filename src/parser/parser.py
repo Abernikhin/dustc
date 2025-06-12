@@ -77,9 +77,21 @@ class parser():
                         ))
                     for i in func:
                         self.reslut[-1].child[-1].append(i)
+                    
                 else:
                     if self.char.get_name(self.tokens[1].lit):
                         raise parser_double_init()
+                    if self.tokens[2].type == "index":
+                        self.char.add_name(self.tokens[1].lit,
+                                           self.tokens[0].lit
+                                           )
+                        self.reslut[-1].append(
+                            node(
+                                "arr name", self.tokens[1], node("size", self.tokens[2])
+                                 )
+                                               )
+                        self.tokens.pop(1)
+                        self.tokens.pop(1)
                     else:
                         self.char.add_name(self.tokens[1].lit,
                                            self.tokens[0].lit
@@ -104,20 +116,13 @@ class parser():
     def eq(self) -> None:
         if self.tokens[0].lit == ';':
             self.semi()
-        elif self.tokens[1].lit == '=':
-            if self.tokens[0].type != "name":
-                raise parser_eq()
-            self.reslut.append(
-                node(
-                    "eq",
-                    self.tokens[1],
-                    node(
-                        "name",
-                        self.tokens[0]
-                        )
-                    )
-                )
+        if self.tokens[1].lit == '=':
+            self.reslut.append(node("eq", self.tokens[1], self.mname()))
             self.tokens.pop(0)
+            self.reslut[-1].append(self.math())
+            self.semi()
+        elif self.tokens[2].lit == '=':
+            self.reslut.append(node("eq", self.tokens[2], self.mname()))
             self.tokens.pop(0)
             self.reslut[-1].append(self.math())
             self.semi()
@@ -130,6 +135,8 @@ class parser():
                 self.reslut.append(node("new", self.tokens[0]))
                 self.tokens.pop(0)
             else:
+                for i in self.tokens:
+                    i.info()
                 raise parser_havent_semicolon()
         except IndexError:
             self.reslut.append(node("new", token("semicolon", ';')))
@@ -143,9 +150,37 @@ class parser():
         else:
             self.semi()
 
+    def mname(self) -> node:
+        if self.tokens[0].lit == "&":
+            n = node(
+                        "op", self.tokens[0], node(
+                                    "ptr",
+                                    self.tokens[1],
+                                    )
+                                )
+            self.tokens.pop(0)
+            self.tokens.pop(0)
+            return n
+        if self.tokens[1].type == "index":
+            n = node("op", self.tokens[1], node("op", self.tokens[0]))
+            self.tokens.pop(0)
+            self.tokens.pop(0)
+            return n
+        n = node("op", self.tokens[0])
+        self.tokens.pop(0)
+        return n
+
     def math(self) -> node:
         if self.tokens[0].lit == ',':
             self.tokens.pop(0)
+        if self.tokens[0].type == "operator++":
+            n = node("incr", self.tokens[0])
+            self.tokens.pop(0)
+            return n
+        if self.tokens[0].type == "operator--":
+            n = node("decr", self.tokens[0])
+            self.tokens.pop(0)
+            return n
         if self.tokens[1].lit == "+" or self.tokens[1].lit == "-":
             n = node("func", self.tokens[1], node("op", self.tokens[0]))
             self.tokens.pop(0)
@@ -200,11 +235,21 @@ class parser():
         if self.tokens[1].lit == '(':
             n = node("call", self.tokens[0])
             self.tokens.pop(0)
-            self.tokens.pop(0)
+            self.tokens.pop(0) 
             while self.tokens[0].lit != ')':
                 n.append(self.math())
             self.tokens.pop(0)
             return n
+        if self.tokens[1].type == 'index':
+            n = node("op", self.tokens[1], node("op", self.tokens[0]))
+            self.tokens.pop(0)
+            self.tokens.pop(0)
+            return n
+        if self.tokens[1].lit == ';':
+            n = node("op", self.tokens[0])
+            self.tokens.pop(0)
+            return n
         n = node("op", self.tokens[0])
         self.tokens.pop(0)
+        n.append(self.math())
         return n

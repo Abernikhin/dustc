@@ -29,3 +29,4 @@ if you want to init variable you must write the next line
 var_name = value;
 ```
 as value you can give functions, numbers or mathematical expression
+

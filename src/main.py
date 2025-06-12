@@ -11,8 +11,8 @@ def main() -> int:
     #     i.info()
     ast = build_ast(tokens)[0]
     char = build_ast(tokens)[1]
-    # for i in ast:  # type: ignore
-    #     i.info()
+    for i in ast:  # type: ignore
+        i.info()
     with open('out.py', 'w')as f:
         f.write(gc(ast, char))  # type: ignore
 
